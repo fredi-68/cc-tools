@@ -1,4 +1,5 @@
 --#import "/lib/shared/cls.lua"
+--#import "/lib/shared/logging.lua"
 
 Task = make_class()
 
@@ -10,6 +11,16 @@ function Task.init(self, loop, coro)
     self._loop = loop
     self._coro._task = self
     self._cbs = {}
+    self._started = false
+end
+
+function Task.has_started(self)
+    return self._started
+end
+
+function Task.start(self)
+    self._started = true
+    self.handle_event({"task_start"})
 end
 
 function Task.is_done(self)
@@ -64,7 +75,7 @@ function Task.handle_event(self, event)
     end
 
     local event_type = event[1]
-    if self._wait_for == event_type or event_type == "terminate" then
+    if self._wait_for == nil or self._wait_for == event_type or event_type == "terminate" then
         local res = table.pack(coroutine.resume(self._coro, table.unpack(event)))
         if res[1] then
             error(res[2], 0)

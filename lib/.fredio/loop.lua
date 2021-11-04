@@ -25,7 +25,11 @@ function EventLoop._run(self, _until)
         for i = 1, #self._tasks do
             local task = self._tasks[i]
             if task ~= nil then
-                task.handle_event(event)
+                if task.has_started() then
+                    task.handle_event(event)
+                else
+                    task.start()
+                end
                 if task.is_done() then
                     os.queueEvent("task_done", task)
                     self._tasks[task] = nil
