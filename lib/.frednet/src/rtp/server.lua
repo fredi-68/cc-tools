@@ -8,8 +8,9 @@ RTPServer = make_class()
 RTPServer.logger = Logger("rtp.server")
 
 function RTPServer.init(self, port)
-    self.routes = {}
-    self._loop = libfrednet.connect()
+    self.port = port
+    self.routes = {["/index"] = self._index}
+    self._loop = connect()
 end
 
 --[[
@@ -40,35 +41,55 @@ function RTPServer.route(self, path, cb)
     self.routes[path] = cb
 end
 
+--[[
+    Wrap a peripheral table in an RTP API.
+    Automatically creates routes for each function provided by
+    the peripheral.
+]]
+function RTPServer.wrap(self, peripheral)
+    for key, fn in pairs(peripheral) do
+        self.route("/" .. key, function (request) request.respond(fn(request.data)) end)
+    end
+end
+
+function RTPServer._index(self, request)
+    local res = {}
+    for key, fn in pairs(self.routes) do
+        table.insert(res, key)
+    end
+    request.respond(res)
+end
+
 function RTPServer._serve(self)
     return function ()
-        while libfrednet.is_connected() do
+        self.logger.info("Now serving RTP requests on port " .. self.port)
+        while is_connected() do
             local event, src_addr, src_port, dst_port, data = os.pullEvent("frednet_message")
             if dst_port == self.port then
-                self.logger.verbose("New connection from " .. libfrednet.num2ip(src_addr) .. ":" .. src_port)
+                self.logger.verbose("New connection from " .. num2ip(src_addr) .. ":" .. src_port)
                 if data.path ~= nil then
                     local cb = self.routes[data.path]
                     if cb ~= nil then
                         local t = {
                             src_addr = src_addr,
                             src_port = src_port,
-                            data = data,
+                            data = data.data,
                             respond = function (r_data)
-                                return libfrednet.transmit(src_addr, src_port, self.port, {error=0, data=r_data})
+                                return transmit(src_addr, src_port, self.port, {error=0, data=r_data})
                             end,
                             error = function (reason)
                                 self.logger.error("Error happened in '" .. data.path .. "': " .. reason)
-                                return libfrednet.transmit(src_addr, src_port, self.port, {error=3, data=reason})
+                                return transmit(src_addr, src_port, self.port, {error=3, data=reason})
                             end
                         }
                         cb(t)
                     else
                         self.logger.error("ERROR: Path '" .. data.path .. "', resource location is not valid or does not exist.")
-                        libfrednet.transmit(src_addr, src_port, self.port, {error=2})
+                        transmit(src_addr, src_port, self.port, {error=2})
                     end
                 else
                     self.logger.error("ERROR: No path specified, invalid request.")
-                    libfrednet.transmit(src_addr, src_port, self.port, {error=1})
+                    transmit(src_addr, src_port, self.port, {error=1})
                 end
             end
         end
@@ -80,5 +101,6 @@ end
     Start the server and wait for incoming connections.
 ]]
 function RTPServer.start(self)
+    self.logger.debug("Starting RTP server...")
     parallel.waitForAll(self._loop, self._serve())
 end

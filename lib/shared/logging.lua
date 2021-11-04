@@ -47,6 +47,6 @@ end
 
 logger = Logger("root")
 
-function set_level(lvl)
+function set_log_level(lvl)
     LEVEL = lvl
 end
