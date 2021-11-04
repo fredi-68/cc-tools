@@ -3,7 +3,7 @@
 
 Task = make_class()
 
-Task.logger = Logger("loop.Task")
+Task.logger = Logger("fredio.Task")
 
 function Task.init(self, loop, coro)
     assert(type(coro) == "thread", "First argument to Task constructor must be a thread object, not " .. type(coro))
@@ -19,6 +19,7 @@ end
 
 function Task.start(self)
     self._started = true
+    self.logger.debug("Starting new Task with coroutine " .. tostring(self._coro))
     self.handle_event({"task_start"})
 end
 
@@ -50,7 +51,7 @@ function Task.wait_for_result(self)
     while not self.is_done() do
         coroutine.yield("task_done", self)
     end
-    return self._result
+    return table.unpack(self._result)
 end
 
 --[[
@@ -76,8 +77,8 @@ function Task.handle_event(self, event)
     local event_type = event[1]
     if self._wait_for == nil or self._wait_for == event_type or event_type == "terminate" then
         local res = table.pack(coroutine.resume(self._coro, table.unpack(event)))
-        if res[1] then
-            error(res[2], 0)
+        if not res[1] then
+            error("Error occurred in coroutine: " .. res[2], 0)
         end
         if self.is_done() then
             self.set_result(true, table.unpack(res, 2))
@@ -92,10 +93,13 @@ end
 ]]
 function Task.set_result(self, success, ...)
     self._result = table.pack(...)
-    for cb in self._cbs do
-        local success, result = pcall(cb, ...)
-        if not success then
-            self.logger.error(tostring(result))
+    for i = 1, #self._cbs do
+        local cb = self._cbs[i]
+        if cb ~= nil then
+            local success, result = pcall(cb, ...)
+            if not success then
+                self.logger.error(tostring(result))
+            end
         end
     end
 end

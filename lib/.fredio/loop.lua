@@ -1,11 +1,15 @@
 --#import "/lib/shared/cls.lua"
+--#import "/lib/shared/logging.lua"
 --#import "task.lua"
 
 EventLoop = make_class()
 
+EventLoop.logger = Logger("fredio.EventLoop")
+
 function EventLoop.init(self)
     self._is_running = False
     self._tasks = {}
+    self._task_ind = 0
     self._task_count = 0
 end
 
@@ -19,11 +23,11 @@ end
 ]]
 function EventLoop._run(self, _until)
     self._is_running = true
+    self.logger.debug("Starting event loop.")
     while self._is_running and self._task_count > 0 and (_until == nil or not _until.is_done()) do
         local event = table.pack(os.pullEventRaw())
         -- iterate over all running tasks
-        for i = 1, #self._tasks do
-            local task = self._tasks[i]
+        for i, task in pairs(self._tasks) do
             if task ~= nil then
                 if task.has_started() then
                     task.handle_event(event)
@@ -31,9 +35,11 @@ function EventLoop._run(self, _until)
                     task.start()
                 end
                 if task.is_done() then
+                    self.logger.debug("Task finished for coroutine " .. tostring(task._coro))
                     os.queueEvent("task_done", task)
-                    self._tasks[task] = nil
+                    self._tasks[i] = nil
                     self._task_count = self._task_count - 1
+                    self.logger.debug("Task count is now " .. self._task_count)
                 end
             end
         end
@@ -49,7 +55,7 @@ end
 ]]
 function EventLoop.call(self, fn, ...)
     local args = table.pack(...)
-    return self.task(coroutine.create(function () fn(table.unpack(args)) end))
+    return self.task(coroutine.create(function () return fn(table.unpack(args)) end))
 end
 
 --[[
@@ -58,7 +64,7 @@ end
 ]]
 function EventLoop.task(self, coro)
     local t = Task(self, coro)
-    table.insert(self.tasks, t)
+    table.insert(self._tasks, t)
     self._task_count = self._task_count + 1
     return t
 end
@@ -98,4 +104,14 @@ function EventLoop.close(self)
             pcall(task.cancel)
         end
     end
+end
+
+--[[
+    Create a task from a function, then wait for it to complete and return the result.
+
+    For even more lazy Python programmers.
+]]
+function EventLoop.await(self, fn, ...)
+    local args = table.pack(...)
+    return self.task(coroutine.create(function () return fn(table.unpack(args)) end)).wait_for_result()
 end
