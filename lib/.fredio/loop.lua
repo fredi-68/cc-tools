@@ -94,17 +94,8 @@ function EventLoop.close(self)
         local task = self.tasks[i]
         -- make sure the Task exists and is not currently running
         -- (we cannot cancel a running task)
-        if task ~= nil and task ~= get_task() then
+        if task ~= nil and task._coro == coroutine.running() then
             pcall(task.cancel)
         end
     end
-end
-
---[[
-    Returns the event loop running the current coroutine.
-    Returns nil if no event loop is running.
-]]
-function get_event_loop(self)
-    local coro, main = coroutine.running()
-    return coro._task._loop
 end

@@ -9,7 +9,6 @@ function Task.init(self, loop, coro)
     assert(type(coro) == "thread", "First argument to Task constructor must be a thread object, not " .. type(coro))
     self._coro = coro
     self._loop = loop
-    self._coro._task = self
     self._cbs = {}
     self._started = false
 end
@@ -99,13 +98,4 @@ function Task.set_result(self, success, ...)
             self.logger.error(tostring(result))
         end
     end
-end
-
---[[
-    Returns the Task associated with the currently running coroutine.
-    Returns nil if no Task is being executed.
-]]
-function get_task()
-    local coro, main = coroutine.running()
-    return coro._task
 end
