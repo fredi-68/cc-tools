@@ -38,8 +38,7 @@ end
     control will return to the caller.
 ]]
 function Task.cancel(self)
-    coroutine.close(self._coro)
-    self._is_running = false
+    return self.handle_event({"terminate"})
 end
 
 --[[
@@ -51,7 +50,7 @@ function Task.wait_for_result(self)
     while not self.is_done() do
         coroutine.yield("task_done", self)
     end
-    return table.unpack(self._result)
+    return self._result == nil and nil or table.unpack(self._result)
 end
 
 --[[
@@ -77,8 +76,8 @@ function Task.handle_event(self, event)
     local event_type = event[1]
     if self._wait_for == nil or self._wait_for == event_type or event_type == "terminate" then
         local res = table.pack(coroutine.resume(self._coro, table.unpack(event)))
-        if not res[1] then
-            error("Error occurred in coroutine: " .. res[2], 0)
+        if not res[1] and event_type ~= "terminate" then
+            error(res[2], 0)
         end
         if self.is_done() then
             self.set_result(true, table.unpack(res, 2))

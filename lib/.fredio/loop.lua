@@ -29,10 +29,14 @@ function EventLoop._run(self, _until)
         -- iterate over all running tasks
         for i, task in pairs(self._tasks) do
             if task ~= nil then
+                local ok, reason
                 if task.has_started() then
-                    task.handle_event(event)
+                    ok, reason = pcall(task.handle_event, event)
                 else
-                    task.start()
+                    ok, reason = pcall(task.start)
+                end
+                if not ok then
+                    self.logger.error("Error encountered in running task: " .. tostring(reason))
                 end
                 if task.is_done() then
                     self.logger.debug("Task finished for coroutine " .. tostring(task._coro))
