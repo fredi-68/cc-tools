@@ -5,6 +5,7 @@ This includes:
 - a complete custom network stack (RedNet replacement) with support for assignable addresses, port multiplexing and other features
 - a class utility for creating classes
 - a logging library
+- a framework for asynchronous programming with tasks based on coroutines
 - a python script for resolving relative imports and linking multiple files into one API for easy loading during boot.
 
 # build_tools
