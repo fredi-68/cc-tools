@@ -32,7 +32,7 @@ local function get_route(addr)
     return _c
 end
 
-local _loop = libfrednet.connect()
+local _loop = libfredio.EventLoop()
 
 local do_routing = function ()
     while libfrednet.is_connected() do
@@ -49,4 +49,5 @@ local do_routing = function ()
     end
 end
 
-parallel.waitForAll(_loop, do_routing)
+_loop.call(libfrednet.connect())
+_loop.run_until_complete(coroutine.create(do_routing))

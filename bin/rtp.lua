@@ -4,6 +4,8 @@
     Useful for API exploration during development.
 ]]
 
+loop = libfredio.EventLoop()
+
 function application()
     print("Please enter the address of the RTP server: ")
     local addr = read()
@@ -29,4 +31,5 @@ function application()
     end
 end
 
-parallel.waitForAny(libfrednet.connect(), application)
+loop.call(libfrednet.connect())
+loop.run_until_complete(coroutine.create(application))

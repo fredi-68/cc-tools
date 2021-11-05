@@ -7,10 +7,10 @@ RTPServer = make_class()
 
 RTPServer.logger = Logger("rtp.server")
 
-function RTPServer.init(self, port)
+function RTPServer.init(self, port, loop)
     self.port = port
     self.routes = {["/index"] = self._index}
-    self._loop = connect()
+    self._loop = loop
 end
 
 --[[
@@ -99,8 +99,18 @@ end
 
 --[[
     Start the server and wait for incoming connections.
+
+    If no event loop was specified, this call will create a new event loop
+    and immediately start it, blocking until the server is shut down.
+    If you specified your own event loop, you are responsible for starting it.
 ]]
 function RTPServer.start(self)
     self.logger.debug("Starting RTP server...")
-    parallel.waitForAll(self._loop, self._serve())
+    if self._loop == nil then
+        self._loop = libfredio.EventLoop()
+        self._loop.call(connect())
+        self._loop.call(self._serve())
+        return self._loop.run_forever()
+    end
+    self._loop.call(self._serve())
 end

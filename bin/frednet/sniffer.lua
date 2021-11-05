@@ -1,4 +1,4 @@
-local _loop = libfrednet.connect()
+local _loop = libfredio.EventLoop()
 
 local display_ip_packets = function ()
     while libfrednet.is_connected() do
@@ -7,4 +7,5 @@ local display_ip_packets = function ()
     end
 end
 
-parallel.waitForAll(_loop, display_ip_packets)
+_loop.call(libfrednet.connect())
+_loop.run_until_complete(coroutine.create(display_ip_packets))

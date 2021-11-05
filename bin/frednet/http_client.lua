@@ -4,6 +4,8 @@
     This program implements client side HTTP over RTP/IPMC.
 ]]
 
+loop = libfredio.EventLoop()
+
 local function application()
     print("Enter the IP of the gateway host: ")
     local host = read()
@@ -19,4 +21,5 @@ local function application()
 end
 
 -- Connect to frednet and start the event loop
-parallel.waitForAny(libfrednet.connect(), application)
+loop.call(libfrednet.connect())
+loop.run_until_complete(coroutine.create(application))
