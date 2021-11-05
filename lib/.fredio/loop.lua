@@ -119,3 +119,24 @@ function EventLoop.await(self, fn, ...)
     local args = table.pack(...)
     return self.task(coroutine.create(function () return fn(table.unpack(args)) end)).wait_for_result()
 end
+
+--[[
+    Shorthand for `function () return coroutine.create(fn) end`.
+
+    Use for Python style async function definitions, e.g. 
+    
+        my_coro_func = async (function (who) 
+            print("Hello " .. who)
+        end)
+
+        my_coro_obj = my_coro_func("World")
+        my_task = loop.task(my_coro_obj)
+]]
+function async (fn)
+    return function(...)
+        local args = table.pack(...)
+        return coroutine.create(function () 
+            fn(table.unpack(args))
+        end)
+    end
+end
