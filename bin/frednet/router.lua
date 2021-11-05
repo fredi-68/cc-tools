@@ -1,3 +1,7 @@
+dofile("/lib/shared/logging.lua")
+
+logger = Logger("router")
+
 local router_config = textutils.unserialize(fs.open(".frednet-router", "r").readAll())
 local routing_table = {}
 local main_gateway = nil
@@ -41,8 +45,9 @@ local do_routing = function ()
         local i_dst = get_route(dst_addr)
         if i_src ~= i_dst then
             if i_dst == nil then
-                print("ERROR: No route to " .. libfrednet.num2ip(dst_addr))
+                logger.error("ERROR: No route to " .. libfrednet.num2ip(dst_addr))
             else
+                logger.debug("Forwarded packet from " .. i_src.side .. " to " .. i_dst.side)
                 libfrednet.transmit_routed(dst_addr, dst_port, src_addr, src_port, msg, i_dst.side)
             end
         end
