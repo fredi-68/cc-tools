@@ -61,7 +61,7 @@ function RTPServer._index(self, request)
 end
 
 function RTPServer._serve(self)
-    return async(function ()
+    return libfredio.async(function ()
         self.logger.info("Now serving RTP requests on port " .. self.port)
         while is_connected() do
             local event, src_addr, src_port, dst_port, data = os.pullEvent("frednet_message")
