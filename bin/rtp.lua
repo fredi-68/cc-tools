@@ -31,5 +31,5 @@ function application()
     end
 end
 
-loop.call(libfrednet.connect())
+loop.task(libfrednet.connect())
 loop.run_until_complete(coroutine.create(application))

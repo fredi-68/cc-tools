@@ -21,5 +21,5 @@ local function application()
 end
 
 -- Connect to frednet and start the event loop
-loop.call(libfrednet.connect())
+loop.task(libfrednet.connect())
 loop.run_until_complete(coroutine.create(application))

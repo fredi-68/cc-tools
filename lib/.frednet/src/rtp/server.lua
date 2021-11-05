@@ -61,7 +61,7 @@ function RTPServer._index(self, request)
 end
 
 function RTPServer._serve(self)
-    return function ()
+    return async(function ()
         self.logger.info("Now serving RTP requests on port " .. self.port)
         while is_connected() do
             local event, src_addr, src_port, dst_port, data = os.pullEvent("frednet_message")
@@ -94,7 +94,7 @@ function RTPServer._serve(self)
             end
         end
         self.logger.info("exit")
-    end
+    end)()
 end
 
 --[[
@@ -108,9 +108,9 @@ function RTPServer.start(self)
     self.logger.debug("Starting RTP server...")
     if self._loop == nil then
         self._loop = libfredio.EventLoop()
-        self._loop.call(connect())
-        self._loop.call(self._serve())
+        self._loop.task(connect())
+        self._loop.task(self._serve())
         return self._loop.run_forever()
     end
-    self._loop.call(self._serve())
+    self._loop.task(self._serve())
 end
