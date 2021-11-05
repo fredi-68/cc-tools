@@ -40,7 +40,7 @@ function connect (side)
         _open_modem(peripheral.wrap(side))
     end
     _connected = true
-    return function ()
+    return async(function ()
         while _connected do
             local event, side, ch_d, ch_s, msg, dist = os.pullEvent("modem_message") 
             h = packet_handlers[ch_d]
@@ -49,7 +49,8 @@ function connect (side)
             end
         end
         print("exiting frednet event loop")
-    end
+    end)()
+
 end
 
 --[[

@@ -20,7 +20,7 @@ end
 function Task.start(self)
     self._started = true
     self.logger.debug("Starting new Task with coroutine " .. tostring(self._coro))
-    self.handle_event({"task_start"})
+    self.handle_event({"task_start", self})
 end
 
 function Task.is_done(self)
