@@ -26,7 +26,10 @@ end
 ]]
 function ip2num(ip)
     local n = 0
-    local parts = string.split(ip, "[.]")
+    local ok, parts = pcall(string.split, ip, "[.]")
+    if not ok then
+        error("Invalid value for ip: " .. tostring(parts))
+    end
     assert(#parts == 3, "Invalid value for ip: Incorrect amount of separators encountered, expected 2 but got " .. #parts-1)
     for i, v in ipairs(parts) do
         local byte = tonumber(v)
