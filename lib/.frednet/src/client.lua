@@ -24,6 +24,18 @@ local function _open_modem(m)
 end
 
 --[[
+    Returns true if a modem is present on this computer,
+    false otherwise.
+    Checks all sides for a modem peripheral.
+]]
+function has_modem()
+    for _, m in pairs(modems) do
+        return true
+    end
+    return false
+end
+
+--[[
     Connect to frednet.
 
     Returns a thread representing the running event loop.
