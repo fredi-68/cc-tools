@@ -1,0 +1,10 @@
+my_func = libfredio.async(function ()
+    print("Currently running task: " .. tostring(libfredio.get_task()))
+    print("Currently running event loop: " .. tostring(libfredio.get_event_loop()))
+end)
+
+loop = libfredio.EventLoop()
+task = loop.task(my_func())
+print("Task is " .. tostring(task))
+print("Event loop is " .. tostring(loop))
+loop.run_forever()
