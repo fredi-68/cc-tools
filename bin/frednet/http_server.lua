@@ -29,6 +29,7 @@ server.route("/get", function(request)
     if headers == nil then
         headers = {}
     end
+    headers["X-Forwarded-For"] = request.src_addr
     -- Call the http library to make the request
     local result = http.get(url, headers)
     -- Return the result to the client
@@ -48,6 +49,7 @@ server.route("/post", function(request)
     if headers == nil then
         headers = {}
     end
+    headers["X-Forwarded-For"] = request.src_addr
     local body = request.data.body == nil and "" or request.data.body
     -- Call the http library to make the request
     local result = http.post(url, body, headers)

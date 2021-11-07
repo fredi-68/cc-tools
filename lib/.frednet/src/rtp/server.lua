@@ -66,12 +66,13 @@ function RTPServer._serve(self)
         while is_connected() do
             local event, src_addr, src_port, dst_port, data = os.pullEvent("frednet_message")
             if dst_port == self.port then
-                self.logger.verbose("New connection from " .. num2ip(src_addr) .. ":" .. src_port)
+                local src_addr_s = num2ip(src_addr)
+                self.logger.verbose("New connection from " .. src_addr_s .. ":" .. src_port)
                 if data.path ~= nil then
                     local cb = self.routes[data.path]
                     if cb ~= nil then
                         local t = {
-                            src_addr = src_addr,
+                            src_addr = src_addr_s,
                             src_port = src_port,
                             data = data.data,
                             respond = function (r_data)
