@@ -42,6 +42,9 @@ end
     A running event loop will generate "frednet_message" events for received messages.
 ]]
 function connect (side)
+    if not settings.get("ip") then
+        error("Unable to connect: No IP address set.")
+    end
     if side == nil then
         for s, modem in pairs(modems) do
             _open_modem(modem)
