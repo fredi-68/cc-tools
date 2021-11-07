@@ -32,7 +32,32 @@ server.route("/get", function(request)
     -- Call the http library to make the request
     local result = http.get(url, headers)
     -- Return the result to the client
-    request.respond({status_code = result.getResponseCode(), body = result.readAll()})
+    if result == nil then
+        request.respond({status_code = 500, body = "HTTP GET request failed."})
+    else
+        request.respond({status_code = result.getResponseCode(), body = result.readAll()})
+    end
+end)
+
+server.route("/post", function(request)
+    local url = request.data.url
+    if url == nil then
+        return request.error("No URL was specified.")
+    end
+    local headers = request.data.headers
+    if headers == nil then
+        headers = {}
+    end
+    local body = request.data.body == nil and "" or request.data.body
+    print(textutils.serialiseJSON(body))
+    -- Call the http library to make the request
+    local result = http.post(url, body, headers)
+    -- Return the result to the client
+    if result == nil then
+        request.respond({status_code = 500, body = "HTTP POST request failed."})
+    else
+        request.respond({status_code = result.getResponseCode(), body = result.readAll()})
+    end
 end)
 
 -- Start the server, this call will block.
