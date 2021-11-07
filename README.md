@@ -33,10 +33,7 @@ it replaces, FredIO provides utilities such as task cancellation, asynchronous f
 running event loops. It further provides a full abstraction on the concepts of asynchronous tasks and event loops, offering a lot
 more control than CCs builtin tools.
 
-### Planned Features
-
-- Futures (already possible but requires a considerable amount of boilerplate)
-- Promise-style utility functions (wait for all, wait for any, etc...)
+FredIO does not natively offer JS style Promise support. For a FredIO compatible implementation, see https://github.com/marnixah/cc-tools
 
 ## build_tools
 
