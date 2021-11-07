@@ -49,7 +49,6 @@ server.route("/post", function(request)
         headers = {}
     end
     local body = request.data.body == nil and "" or request.data.body
-    print(textutils.serialiseJSON(body))
     -- Call the http library to make the request
     local result = http.post(url, body, headers)
     -- Return the result to the client
