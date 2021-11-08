@@ -58,8 +58,7 @@ end
     For the lazy JavaScript programmers.
 ]]
 function EventLoop.call(self, fn, ...)
-    local args = table.pack(...)
-    return self.task(coroutine.create(function () return fn(table.unpack(args)) end))
+    return self.task(async(fn)(...))
 end
 
 --[[
