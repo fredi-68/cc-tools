@@ -16,8 +16,13 @@ local executable = nil
 local path_entries = string.gmatch(shell.path(), "[^:]+")
 for path_entry in path_entries do
     local full_path = path_entry .. "/" .. arg[1]
+    local full_path_lua = full_path .. ".lua"
     if fs.exists(full_path) and not fs.isDir(full_path) then
         executable = full_path
+        break
+    end
+    if fs.exists(full_path_lua) and not fs.isDir(full_path_lua) then
+        executable = full_path_lua
         break
     end
 end
