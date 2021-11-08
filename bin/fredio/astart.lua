@@ -31,5 +31,5 @@ local _f = libfredio.async(function (path)
     dofile(path)
 end)
 
-loop.task(_f(arg[1]))
+loop.task(_f(executable))
 loop.run_forever()
