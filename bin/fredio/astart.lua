@@ -6,6 +6,10 @@
 ]]
 
 loop = libfredio.EventLoop()
+if arg[1] == nil then
+    print("Usage: astart.lua <program>")
+    os.exit(1)
+end
 
 -- Find executable in path
 local executable = nil
