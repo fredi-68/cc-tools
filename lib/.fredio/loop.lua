@@ -141,6 +141,17 @@ function async (fn)
     end
 end
 
+--[[
+    Await a coroutine object.
+    
+    This is different from EventLoop.await() in that it 
+    expects a coroutine object rather than a function and
+    MUST be called from within an asynchronous function.
+]]
+function await(coro)
+    return get_event_loop().task(coro).wait_for_result()
+end
+
 function get_task()
     return _TASK
 end

@@ -2,6 +2,7 @@
 --#import "util.lua"
 --#import "ipmc/client.lua"
 --#import "ipmc/packets.lua"
+--#import "dhcp/client.lua"
 
 local modems = {}
 for i, v in ipairs(rs.getSides()) do
@@ -14,7 +15,8 @@ local _connected = false
 settings.load(".frednet-client")
 
 local packet_handlers = {
-    [CHANNEL_IP] = ipmc_handle_packet
+    [CHANNEL_IP] = ipmc_handle_packet,
+    [CHANNEL_DHCP] = dhcp_handle_packet
 }
 
 local function _open_modem(m)
@@ -60,7 +62,7 @@ function connect (side)
             local event, side, ch_d, ch_s, msg, dist = os.pullEvent("modem_message") 
             h = packet_handlers[ch_d]
             if h ~= nil then
-                h(msg)
+                h(msg, side, dist)
             end
         end
         print("exiting frednet event loop")
