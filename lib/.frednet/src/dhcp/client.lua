@@ -23,6 +23,22 @@ function DHCPClient._send_request_address(self)
 end
 
 DHCPClient._wait_for_packet = libfredio.async(function (self, op, timeout)
+    if timeout > 0 then
+        local timeout = os.startTimer(timeout)
+    end
+    while true do
+        local event, side, ch_d, ch_s, msg, dist = os.pullEvent()
+        if event == "modem_message" then
+            if ch_d == CHANNEL_DHCP then
+                if msg.opcode == op then
+                    return msg
+                end
+            end
+        elseif event == "timeout" then
+            return nil
+        end
+    end
+
 end)
 
 DHCPClient._run = libfredio.async(function (self)
