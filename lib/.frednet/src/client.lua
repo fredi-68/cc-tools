@@ -88,6 +88,19 @@ function is_connected()
 end
 
 
+function _frednet_send(channel, data, side)
+    if side == nil then
+        for s, modem in pairs(modems) do
+            if modem.isOpen(channel) then
+                modem.transmit(channel, channel, data)
+            end
+        end
+    else
+        assert(modems[side] ~= nil, "Tried sending packet via interface on side " .. side .. " but no modem was found.")
+        modems[side].transmit(channel, channel, data)
+    end
+end
+
 --[[
     Transmit a data packet to another computer.
     Optional argument side specifies the interface to be used.
@@ -102,14 +115,5 @@ end
 function transmit_routed(dst_addr, dst_port, src_addr, src_port, data, side)
     assert(_connected, "Not connected to frednet.")
     local p = IpPacket(src_addr, src_port, dst_addr, dst_port, data)
-    if side == nil then
-        for s, modem in pairs(modems) do
-            if modem.isOpen(CHANNEL_IP) then
-                modem.transmit(CHANNEL_IP, CHANNEL_IP, p)
-            end
-        end
-    else
-        assert(modems[side] ~= nil, "Tried sending packet via interface on side " .. side .. " but no modem was found.")
-        modems[side].transmit(CHANNEL_IP, CHANNEL_IP, p)
-    end
+    _frednet_send(CHANNEL_IP, p, side)
 end
