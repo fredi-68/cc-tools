@@ -22,7 +22,7 @@ easier. RTP was designed to avoid boilerplate code but still allow to be integra
 ### Planned features
 
 - DHCP autoconfigure
-- DNS
+- Non-authoritative DNS answers (and potentially recursive DNS)
 - ARP (for local DNS resolution mostly, since we don't really have to care about computer IDs)
 - sockets
 
