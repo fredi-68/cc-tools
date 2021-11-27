@@ -1,10 +1,11 @@
 --#import "/lib/shared/cls.lua"
+--#import "../dns/client.lua"
 --#import "../client.lua"
 
 RTPClient = make_class()
 
 function RTPClient.init(self, host, port)
-    self.host = ip2num(host)
+    self.host = host
     self.port = port
 end
 

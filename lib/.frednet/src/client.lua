@@ -3,6 +3,7 @@
 --#import "ipmc/client.lua"
 --#import "ipmc/packets.lua"
 --#import "dhcp/client.lua"
+--#import "dns/client.lua"
 
 local modems = {}
 for i, v in ipairs(rs.getSides()) do
@@ -92,6 +93,9 @@ end
     Optional argument side specifies the interface to be used.
 ]]
 function transmit(dst_addr, dst_port, src_port, data, side)
+    if type(dst_addr) == "string" then
+        dst_addr = ip2num(resolve_hostname(dst_addr))
+    end
     return transmit_routed(dst_addr, dst_port, ip2num(settings.get("frednet.ip")), src_port, data, side)
 end
 
