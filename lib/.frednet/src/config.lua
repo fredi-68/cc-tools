@@ -1,4 +1,4 @@
---#import utils.lua
+--#import util.lua
 
 _CONFIG = {}
 _CONFIG_PATH = ".frednet-config"
