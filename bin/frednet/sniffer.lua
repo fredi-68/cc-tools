@@ -19,5 +19,4 @@ local display_ip_packets = function ()
     end
 end
 
-_loop.task(libfrednet.connect())
 _loop.run_until_complete(coroutine.create(display_ip_packets))

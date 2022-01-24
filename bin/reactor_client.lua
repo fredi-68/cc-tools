@@ -91,5 +91,4 @@ application = libfredio.async(function ()
     end
 end)
 
-loop.task(libfrednet.connect())
 loop.run_until_complete(application())

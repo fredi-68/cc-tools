@@ -56,5 +56,4 @@ local do_routing = function ()
     end
 end
 
-_loop.task(libfrednet.connect())
 _loop.run_until_complete(coroutine.create(do_routing))

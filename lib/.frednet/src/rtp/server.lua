@@ -109,7 +109,9 @@ function RTPServer.start(self)
     self.logger.debug("Starting RTP server...")
     if self._loop == nil then
         self._loop = libfredio.EventLoop()
-        self._loop.task(connect())
+        if not is_connected() then
+            self._loop.task(connect())
+        end
         self._loop.task(self._serve())
         return self._loop.run_forever()
     end

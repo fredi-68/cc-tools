@@ -187,6 +187,5 @@ server.route("/get_status", function(request)
 end)
 
 server.start()
-loop.task(libfrednet.connect())
 loop.task(control_loop(reactor))
 loop.run_forever()
