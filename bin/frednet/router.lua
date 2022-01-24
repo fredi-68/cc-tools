@@ -1,7 +1,5 @@
 dofile("/lib/shared/logging.lua")
 
-set_log_level(DEBUG)
-
 logger = Logger("router")
 
 local router_config = textutils.unserialize(fs.open(".frednet-router", "r").readAll())
