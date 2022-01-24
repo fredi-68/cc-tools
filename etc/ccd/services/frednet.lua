@@ -5,3 +5,7 @@ function self.run()
     l.task(libfrednet.connect())
     l.run_forever()
  end
+
+ function self.after() 
+    libfrednet.disconnect()
+ end

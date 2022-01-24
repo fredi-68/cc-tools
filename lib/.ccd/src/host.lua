@@ -14,10 +14,10 @@ function ServiceHost._run(self)
         if event[1] == E_SERVICE_START then
             local service_file = event[2]
             local service = Service(service_file, event[3], event[4])
-            
+        
             local ok, reason = pcall(service.start)
             if not ok then
-                print("[ ERROR ] Service " .. service.service_file .. "failed to start: " .. reason)
+                print("[ ERROR ] Service " .. service.service_file .. " failed to start: " .. reason)
             else
                 table.insert(self.services, service)
             end

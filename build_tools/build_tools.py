@@ -157,8 +157,8 @@ if __name__ == "__main__":
             f.write("-- build_tools.py Startup Script\n\n")
             f.write("-- This file was automatically generated. DO NOT EDIT.\n")
             f.write("--================================================================\n\n")
-            f.write("if _apis_loaded == nil then\n")
+            f.write("if _G.apis_loaded == nil then\n")
             for i in lib_paths:
                 f.write("  os.loadAPI(\"%s\")\n" % i)
-            f.write("  _apis_loaded = true\n")
+            f.write("  _G.apis_loaded = true\n")
             f.write("end")
