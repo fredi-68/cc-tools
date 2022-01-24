@@ -16,8 +16,6 @@ local function application()
     -- Fetch the HTTP resource synchronously with our RTPClient
     local res = client.get_resource("/get", {url = url})
     print("HTTP Code " .. res.status_code .. ": " .. res.body)
-    -- Disconnect from frednet
-    libfrednet.disconnect()
 end
 
 -- Connect to frednet and start the event loop
