@@ -8,11 +8,17 @@ function ServiceHost.init(self)
     self.service_directory = SERVICE_DIRECTORY
 end
 
+function ServiceHost.resolve_service_name(self, name)
+    if fs.exists(name) then return name end
+    if fs.exists(self.service_directory .. "/" .. name) then return self.service_directory .. "/" .. name end
+    return nil
+end
+
 function ServiceHost._run(self)
     while true do
         local event = table.pack(os.pullEventRaw())
         if event[1] == E_SERVICE_START then
-            local service_file = event[2]
+            local service_file = self.resolve_service_name(event[2])
             local service = Service(service_file, event[3], event[4])
         
             local ok, reason = pcall(service.start)

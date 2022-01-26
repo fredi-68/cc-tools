@@ -17,13 +17,18 @@ DEFAULT_CONFIG = {
 
 function self.before()
     if not fs.exists(CONFIG_PATH) then
-        fs.write(CONFIG_PATH, textutils.serialize(DEFAULT_CONFIG))
+        print("[dhcpd] First time setup, creating configuration for default context...")
+        local f = fs.open(CONFIG_PATH, "w")
+        f.write(textutils.serialize(DEFAULT_CONFIG))
+        f.close()
     end
 end
 
 function self.run()
 
-    local config = textutils.unserialize(fs.read(CONFIG_PATH))
+    local f = fs.open(CONFIG_PATH, "r")
+    local config = textutils.unserialize(f.readAll())
+    f.close()
 
     local iface = config.iface
     local network = config.network

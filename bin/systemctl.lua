@@ -21,10 +21,10 @@ elseif arg[1] == "stop" then
     os.queueEvent(libccd.E_SERVICE_STOP, service_name, nil, new_args)
 elseif arg[1] == "enable" then
     fs.copy(service_name, libccd.SERVICE_DIRECTORY .. "/" .. fs.getName(service_name))
-    os.queueEvent(libccd.E_SERVICE_START, fs.getName(service_name), libccd.SERVICE_DIRECTORY, new_args)
+    os.queueEvent(libccd.E_SERVICE_START, fs.getName(service_name), nil, new_args)
 elseif arg[1] == "disable" then
     fs.delete(libccd.SERVICE_DIRECTORY .. "/" .. fs.getName(service_name))
-    os.queueEvent(libccd.E_SERVICE_STOP, fs.getName(service_name), libccd.SERVICE_DIRECTORY, new_args)
+    os.queueEvent(libccd.E_SERVICE_STOP, fs.getName(service_name), nil, new_args)
 else
     print("Usage: systemctl <start|stop|enable|disable> <service>")
     os.exit(1)

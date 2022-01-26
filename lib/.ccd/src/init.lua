@@ -30,7 +30,7 @@ function do_init()
     fs.makeDir(SERVICE_DIRECTORY)
   end
   for i, path in ipairs(fs.list(SERVICE_DIRECTORY)) do
-    os.queueEvent(E_SERVICE_START, path, SERVICE_DIRECTORY)
+    os.queueEvent(E_SERVICE_START, path, nil)
   end
 
   -- Create service host and start running 
