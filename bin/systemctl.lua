@@ -10,7 +10,7 @@
 local service_name = arg[2]
 if service_name == nil then
     print("Usage: systemctl <start|stop|enable|disable> <service>")
-    os.exit(1)
+    return
 end
 
 new_args = table.pack(table.unpack(arg, 3))
@@ -27,5 +27,7 @@ elseif arg[1] == "disable" then
     os.queueEvent(libccd.E_SERVICE_STOP, fs.getName(service_name), nil, new_args)
 else
     print("Usage: systemctl <start|stop|enable|disable> <service>")
-    os.exit(1)
+    return 
 end
+
+coroutine.yield() -- wait for the event to get handled before returning to the calling shell.
