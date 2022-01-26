@@ -38,3 +38,9 @@ DHCPServer._packet_handler = libfredio.async(function(self)
         end
     end
 end)
+
+function DHCPServer.start(self)
+    local loop = libfredio.EventLoop()
+    loop.task(self._packet_handler())
+    loop.run_forever()
+end
