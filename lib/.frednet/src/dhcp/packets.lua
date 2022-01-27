@@ -9,12 +9,12 @@ end
 
 RespondConfigPacket = make_class()
 
-function RespondConfigPacket.init(self, host_id, net_addr, net_mask, gateway_id, gateway_addr, dhcp_opt)
+function RespondConfigPacket.init(self, host_id, net_addr, net_mask, dns_addr, gateway_addr, dhcp_opt)
     self.opcode = 0x2
     self.host_id = host_id
     self.net_addr = net_addr
     self.net_mask = net_mask
-    self.gateway_id = gateway_id
+    self.dns_addr = dns_addr
     self.gateway_addr = gateway_addr
     if dhcp_opt == nil then
         self.dhcp_opt = {}

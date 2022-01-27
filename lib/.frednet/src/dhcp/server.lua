@@ -7,8 +7,6 @@ DHCPServer = make_class()
 
 DHCPServer.logger = Logger("DHCP")
 
-set_log_level(DEBUG)
-
 function DHCPServer.init(self, side, network, netmask, range, gateway, dns, lease_time, options)
     self.leases = {}
     self.lease_map = {}
@@ -25,7 +23,7 @@ end
 
 function DHCPServer._send_config(self, packet)
     self.logger.debug("Device " .. packet.host_id .. " requested network configuration")
-    packet = RespondConfigPacket(packet.host_id, self.network, self.netmask, nil, self.gateway, self.options)
+    packet = RespondConfigPacket(packet.host_id, self.network, self.netmask, self.dns, self.gateway, self.options)
     _frednet_send(CHANNEL_DHCP, packet, self.side)
 end
 

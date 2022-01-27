@@ -21,7 +21,7 @@ function resolve_hostname(hostname)
     
     logger.debug("Looking up address for hostname " .. hostname)
     local p = DNSQuery(hostname)
-    local address = ip2num(settings.get("frednet.dns_server"))
+    local address = ip2num(get_network_config().dns_server)
     transmit(address, 53, 53, p)
     local timeout = os.startTimer(5)
     while true do

@@ -2,8 +2,6 @@
 --#import "../config.lua"
 --#import "packets.lua"
 
-set_log_level(DEBUG)
-
 function dhcp_handle_packet(packet, side, dist)
     os.queueEvent("dhcp_packet", packet, side)
 end
@@ -76,7 +74,8 @@ DHCPClient.run = libfredio.async(function (self)
                 netmask = num2ip(p.net_mask), 
                 gateway = num2ip(p.gateway_addr), 
                 dhcp_options = p.dhcp_opts,
-                network = num2ip(p.net_addr)
+                network = num2ip(p.net_addr),
+                dns_server = num2ip(p.dns_addr),
             }
             push_network_config(c)
             save_config()

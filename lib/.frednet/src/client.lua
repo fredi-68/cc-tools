@@ -106,7 +106,7 @@ end
 ]]
 function transmit(dst_addr, dst_port, src_port, data, side)
     local src_addr = get_local_host_ip()
-    if src_addr then
+    if src_addr == nil then
         error("Unable to connect: No IP address set.")
     end
     if type(dst_addr) == "string" then
