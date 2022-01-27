@@ -34,7 +34,7 @@ function ip2num(ip)
     for i, v in ipairs(parts) do
         local byte = tonumber(v)
         assert(byte >= 0 and byte <= 255, "Invalid value for ip: " .. v)
-        n = bit.bor(n, bit.blshift(byte, (i-1)*8))
+        n = bit.bor(byte, bit.blshift(n, 8))
     end
     return n
 end
@@ -45,7 +45,7 @@ end
 function num2ip(num)
     local parts = {}
     for i=0, 2 do
-        table.insert(parts, tostring(bit.band(255, bit.brshift(num, i*8))))
+        table.insert(parts, 1, tostring(bit.band(255, bit.brshift(num, i*8))))
     end
     return table.concat(parts, ".")
 end
