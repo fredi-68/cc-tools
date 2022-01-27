@@ -6,6 +6,7 @@ This includes:
 - a class utility for creating classes
 - a logging library
 - a framework for asynchronous programming with tasks based on coroutines
+- a bootloader/init system for running service/process multiplexing
 - a python script for resolving relative imports and linking multiple files into one API for easy loading during boot.
 
 ## FredNet
@@ -32,6 +33,19 @@ FredIO is an asynchronous multitasking framework built on top of Lua coroutines.
 it replaces, FredIO provides utilities such as task cancellation, asynchronous function composition and queueing new tasks into
 running event loops. It further provides a full abstraction on the concepts of asynchronous tasks and event loops, offering a lot
 more control than CCs builtin tools.
+
+## CCd
+
+CCd is a simple init system which adds the ability to run multiple programs simultaneously through the use of system services.
+CCd is invoked at computer boot by hijacking the initial shell program and launching a service host which loads and executes
+programs defined in service modules. CCd supports starting and stopping of services on demand, dependencies between services and
+automatic restarting of services. System services can be enabled at boot at the users discretion.
+
+### Planned features
+
+- Circular dependency detection
+- Better error handling
+- Integration with logging in order to maintain a system journal
 
 FredIO does not natively offer JS style Promise support. For a FredIO compatible implementation, see https://github.com/marnixah/cc-tools
 
