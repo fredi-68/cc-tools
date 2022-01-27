@@ -1,4 +1,5 @@
--- Run shell so user can actually do stuff
+self.provides = "router"
+self.dependencies = {"frednet"}
 
 function self.run()
     dofile("/bin/frednet/router.lua")

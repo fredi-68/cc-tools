@@ -1,5 +1,7 @@
 -- frednet service
 
+self.provides = "frednet"
+
 function self.run()
     l = libfredio.EventLoop()
     l.task(libfrednet.connect())

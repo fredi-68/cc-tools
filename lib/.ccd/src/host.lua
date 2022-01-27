@@ -4,7 +4,8 @@
 ServiceHost = make_class()
 
 function ServiceHost.init(self) 
-    self.services = {}
+    self.running_services = {}
+    self.pending_services = {}
     self.service_directory = SERVICE_DIRECTORY
 end
 
@@ -20,32 +21,58 @@ function ServiceHost._run(self)
         if event[1] == E_SERVICE_START then
             local service_file = self.resolve_service_name(event[2])
             local service = Service(service_file, event[3], event[4])
-        
-            local ok, reason = pcall(service.start)
-            if not ok then
-                print("[ ERROR ] Service " .. service.service_file .. " failed to start: " .. reason)
-            else
-                table.insert(self.services, service)
-            end
+            
+            -- TODO: resolve dependencies and load them as well
+            table.insert(self.pending_services, service)
         elseif event[1] == E_SERVICE_STOP then
-            local service_file = event[2]
-            for i, service in ipairs(self.services) do
+            local service_file = self.resolve_service_name(event[2])
+            for i, service in ipairs(self.running_services) do
                 if service.service_file == service_file then
                     service.stop()
-                    self.services[i] = nil
+                    self.running_services[i] = nil
                     break
                 end
             end
         elseif event[1] == E_SHUTDOWN then
-            for i, service in ipairs(self.services) do
+            for i, service in ipairs(self.running_services) do
                 service.stop()
             end
-            self.services = {}
+            self.running_services = {}
             print("Goodbye.")
             break
         end
 
-        for i, service in pairs(self.services) do
+        -- try to start pending services
+        for i, service in ipairs(self.pending_services) do
+            local can_start = true
+            for _, dep in ipairs(service.dependencies) do
+                local resolved = false
+                for _, s in ipairs(self.running_services) do
+                    if s.provides == dep then
+                        resolved = true
+                        break
+                    end
+                end
+                if not resolved then
+                    can_start = false -- service depends on another service which is not running, stop for now
+                    break
+                 end
+            end
+
+            if can_start then
+                local ok, reason = pcall(service.start)
+                if not ok then
+                    print("[ ERROR ] Service " .. service.service_file .. " failed to start: " .. reason)
+                else
+                    table[service.provides] = service
+                    table.insert(self.running_services, service)
+                end
+                self.pending_services[i] = nil
+            end
+        end
+
+        -- handle events for running services
+        for i, service in pairs(self.running_services) do
             if service ~= nil then
                 local ok, reason
                 ok = true
@@ -60,7 +87,7 @@ function ServiceHost._run(self)
                 if not ok then
                     print("[ ERROR ] Service " .. service.service_file ..  " died: " .. tostring(reason))
                     service.stop()
-                    self.services[i] = nil
+                    self.running_services[i] = nil
                 end
             end 
         end

@@ -25,7 +25,6 @@ function do_init()
   local logger = Logger("ccd")
 
   -- Load services at boot
-  -- TODO: figure out load order
   if not fs.exists(SERVICE_DIRECTORY) then
     fs.makeDir(SERVICE_DIRECTORY)
   end
@@ -34,6 +33,6 @@ function do_init()
   end
 
   -- Create service host and start running 
-  local host = ServiceHost()
-  host.run()
+  _G.service_host = ServiceHost()
+  _G.service_host.run()
 end

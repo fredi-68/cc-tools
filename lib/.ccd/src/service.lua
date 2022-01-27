@@ -4,6 +4,8 @@ Service = make_class()
 
 function Service.init(self, service_file, directory, args)
 
+    self.provides = nil
+    self.dependencies = {}
     self.auto_restart = true
 
     if directory == nil then

@@ -2,6 +2,9 @@
     Provides DHCP server
 ]]
 
+self.provides = "dhcp"
+self.dependencies = {"frednet"}
+
 CONFIG_PATH = "/etc/dhcpd.conf"
 
 DEFAULT_CONFIG = {

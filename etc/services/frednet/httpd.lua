@@ -14,6 +14,9 @@
     }
 ]]
 
+self.provides = "http"
+self.dependencies = {"frednet"}
+
 function self.run()
     -- Create server instance running on port 80
     local server = libfrednet.RTPServer(80)
