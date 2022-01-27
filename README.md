@@ -14,7 +14,7 @@ This includes:
 FredNet is a complete network stack created to replace RedNet as the network, transport and application layer protocol suite.
 Like RedNet, FredNet offers ways to communicate with computers via addresses, however, these are not bound to a computer but
 can instead be configured to any (virtual) host on the network. Networks can be divided into subnetwork ranges and connected
-via routers. This allows for a more efficient, performant and secure networking infrastructure.
+via routers. This allows for a more efficient, performant and secure networking infrastructure. DHCP is supported.
 
 FredNet comes with a high level client/server development framework called Resource Transfer Protocol (RTP). It operates on
 top of IPMC, FredNets network routing protocol and can interface with other network services to make communication between hosts
@@ -22,7 +22,6 @@ easier. RTP was designed to avoid boilerplate code but still allow to be integra
 
 ### Planned features
 
-- DHCP autoconfigure
 - Non-authoritative DNS answers (and potentially recursive DNS)
 - ARP (for local DNS resolution mostly, since we don't really have to care about computer IDs)
 - sockets
