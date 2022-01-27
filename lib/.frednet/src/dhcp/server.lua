@@ -7,6 +7,8 @@ DHCPServer = make_class()
 
 DHCPServer.logger = Logger("DHCP")
 
+set_log_level(DEBUG)
+
 function DHCPServer.init(self, side, network, netmask, range, gateway, dns, lease_time, options)
     self.leases = {}
     self.lease_map = {}
@@ -14,14 +16,15 @@ function DHCPServer.init(self, side, network, netmask, range, gateway, dns, leas
     self.side = side
     self.network = ip2num(network)
     self.netmask = ip2num(netmask)
-    self.range = range
+    self.range = tonumber(range)
     self.gateway = ip2num(gateway)
     self.dns = ip2num(dns)
-    self.lease_time = lease_time
+    self.lease_time = tonumber(lease_time)
     self.options = options
 end
 
 function DHCPServer._send_config(self, packet)
+    self.logger.debug("Device " .. packet.host_id .. " requested network configuration")
     packet = RespondConfigPacket(packet.host_id, self.network, self.netmask, nil, self.gateway, self.options)
     _frednet_send(CHANNEL_DHCP, packet, self.side)
 end
@@ -38,12 +41,13 @@ function DHCPServer._send_address(self, packet)
             return
         end
         lease = {
-            addr = self.network + i,
-            exp = os.time() + self.lease_time
+            addr = self.network + i + 1, -- yes that +1 is important, do not remove
+            exp = self.lease_time > 0 and os.time() + self.lease_time or 0
         }
         self.leases[i+1] = lease
         self.lease_map[host_id] = lease
     end
+    self.logger.debug("Device " .. host_id .. " requested new IP lease " .. num2ip(lease.addr))
     packet = RespondAddressPacket(host_id, lease.addr, lease.exp, {})
     _frednet_send(CHANNEL_DHCP, packet, self.side)
 end
@@ -52,9 +56,9 @@ DHCPServer._packet_handler = libfredio.async(function(self)
     while libfrednet.is_connected() do
         local event, packet, side = os.pullEvent("dhcp_packet")
         if side == self.side then
-            if packet.op == 0x1 then
+            if packet.opcode == 0x1 then
                 self._send_config(packet)
-            elseif packet.op == 0x3 then
+            elseif packet.opcode == 0x3 then
                 self._send_address(packet)
             end -- ignore other packets as they are only interesting for clients
         end

@@ -1,7 +1,7 @@
 --#import util.lua
 
 _CONFIG = {}
-_CONFIG_PATH = ".frednet-config"
+_CONFIG_PATH = "/etc/frednet.conf"
 
 function push_network_config(config) 
     for k, v in pairs(config) do
@@ -14,11 +14,18 @@ function get_network_config()
 end
 
 function reload_config()
-    _CONFIG = textutils.unserialize(fs.read(_CONFIG_PATH))
+    if not fs.exists(_CONFIG_PATH) then
+        return
+    end
+    local f = fs.open(_CONFIG_PATH, "r")
+    _CONFIG = textutils.unserialize(f.readAll())
+    f.close()
 end
 
 function save_config()
-    fs.write(_CONFIG_PATH, textutils.serialize(_CONFIG))
+    local f = fs.open(_CONFIG_PATH, "w")
+    f.write(textutils.serialize(_CONFIG))
+    f.close()
 end
 
 --[[
@@ -27,6 +34,9 @@ end
     Returns the configured IP address for the local host.
 ]]
 function get_local_host_ip()
+    if _CONFIG.dhcp_lease ~= nil then
+        return _CONFIG.dhcp_lease.ip
+    end
     return _CONFIG.ip
 end
 
@@ -36,5 +46,5 @@ end
     Returns the configured IP address for the local host as a number.
 ]]
 function get_local_host_ip_num()
-    return ip2num(_CONFIG.ip)
+    return ip2num(get_local_host_ip())
 end

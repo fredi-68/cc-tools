@@ -1,5 +1,6 @@
 --#import "const.lua"
 --#import "util.lua"
+--#import "config.lua"
 --#import "ipmc/client.lua"
 --#import "ipmc/packets.lua"
 --#import "dhcp/client.lua"
@@ -45,9 +46,7 @@ end
     A running event loop will generate "frednet_message" events for received messages.
 ]]
 function connect (side)
-    if not settings.get("frednet.ip") then
-        error("Unable to connect: No IP address set.")
-    end
+    reload_config()
     if side == nil then
         for s, modem in pairs(modems) do
             _open_modem(modem)
@@ -106,10 +105,14 @@ end
     Optional argument side specifies the interface to be used.
 ]]
 function transmit(dst_addr, dst_port, src_port, data, side)
+    local src_addr = get_local_host_ip()
+    if src_addr then
+        error("Unable to connect: No IP address set.")
+    end
     if type(dst_addr) == "string" then
         dst_addr = ip2num(resolve_hostname(dst_addr))
     end
-    return transmit_routed(dst_addr, dst_port, ip2num(settings.get("frednet.ip")), src_port, data, side)
+    return transmit_routed(dst_addr, dst_port, ip2num(src_addr), src_port, data, side)
 end
 
 function transmit_routed(dst_addr, dst_port, src_addr, src_port, data, side)
