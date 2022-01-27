@@ -34,6 +34,7 @@ it replaces, FredIO provides utilities such as task cancellation, asynchronous f
 running event loops. It further provides a full abstraction on the concepts of asynchronous tasks and event loops, offering a lot
 more control than CCs builtin tools.
 
+FredIO does not natively offer JS style Promise support. For a FredIO compatible implementation, see https://github.com/marnixah/cc-tools
 ## CCd
 
 CCd is a simple init system which adds the ability to run multiple programs simultaneously through the use of system services.
@@ -46,8 +47,6 @@ automatic restarting of services. System services can be enabled at boot at the 
 - Circular dependency detection
 - Better error handling
 - Integration with logging in order to maintain a system journal
-
-FredIO does not natively offer JS style Promise support. For a FredIO compatible implementation, see https://github.com/marnixah/cc-tools
 
 ## build_tools
 
