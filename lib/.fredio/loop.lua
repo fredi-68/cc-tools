@@ -136,7 +136,7 @@ function async (fn)
         local args = table.pack(...)
         return coroutine.create(function (_, _t) 
             _TASK = _t
-            fn(table.unpack(args))
+            return fn(table.unpack(args))
         end)
     end
 end
