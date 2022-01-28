@@ -27,8 +27,13 @@ for path_entry in path_entries do
     end
 end
 
+if executable == nil then
+    print("Could not find executable " .. arg[1])
+    os.exit(1)
+end
+
 local _f = libfredio.async(function (path)
-    dofile(path)
+    loadfile(path, _ENV)()
 end)
 
 loop.task(_f(executable))
