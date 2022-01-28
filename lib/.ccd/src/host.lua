@@ -82,6 +82,9 @@ function ServiceHost._run(self)
                     if service.auto_restart then
                         print("[ ERROR ] Service " .. service.service_file .. "appears to be stopped, restarting...")
                         service.start()
+                    else
+                        service.stop()
+                        self.running_services[i] = nil
                     end
                 end
                 if not ok then
