@@ -1,4 +1,5 @@
 --#import const.lua
+--#import journal.lua
 --#import "/lib/shared/cls.lua"
 
 ServiceHost = make_class()
@@ -38,7 +39,7 @@ function ServiceHost._run(self)
                 service.stop()
             end
             self.running_services = {}
-            print("Goodbye.")
+            ccd_log("Goodbye.")
             break
         end
 
@@ -62,7 +63,7 @@ function ServiceHost._run(self)
             if can_start then
                 local ok, reason = pcall(service.start)
                 if not ok then
-                    print("[ ERROR ] Service " .. service.service_file .. " failed to start: " .. reason)
+                    ccd_log("[ ERROR ] Service " .. service.service_file .. " failed to start: " .. reason)
                 else
                     table[service.provides] = service
                     table.insert(self.running_services, service)
@@ -77,10 +78,12 @@ function ServiceHost._run(self)
                 local ok, reason
                 ok = true
                 if service.check_running() then
-                    ok, reason = pcall(service.handle_event, event)
+                    if not (event[1] == "terminate") or not service.ignore_terminate then
+                        ok, reason = pcall(service.handle_event, event)
+                    end
                 else
                     if service.auto_restart then
-                        print("[ ERROR ] Service " .. service.service_file .. "appears to be stopped, restarting...")
+                        ccd_log("[ ERROR ] Service " .. service.service_file .. "appears to be stopped, restarting...")
                         service.start()
                     else
                         service.stop()
@@ -88,7 +91,7 @@ function ServiceHost._run(self)
                     end
                 end
                 if not ok then
-                    print("[ ERROR ] Service " .. service.service_file ..  " died: " .. tostring(reason))
+                    ccd_log("[ ERROR ] Service " .. service.service_file ..  " died: " .. tostring(reason))
                     service.stop()
                     self.running_services[i] = nil
                 end

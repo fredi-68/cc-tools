@@ -50,7 +50,10 @@ function Task.wait_for_result(self)
     while not self.is_done() do
         coroutine.yield("task_done", self)
     end
-    return self._result == nil and nil or table.unpack(self._result)
+    if self._result == nil then
+        return nil
+    end
+    return table.unpack(self._result)
 end
 
 --[[

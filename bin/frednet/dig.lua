@@ -1,7 +1,6 @@
 loop = libfredio.EventLoop()
 if arg[1] == nil then
-    print("Usage: dig <hostname>")
-    os.exit(1)
+    error("Usage: dig <hostname>")
 end
 
 do_lookup = libfredio.async(function () 

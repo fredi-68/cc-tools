@@ -6,6 +6,11 @@ end
     Split a string into several substrings on each occurence of sep.
 ]]
 function string.split(s, sep)
+    if not (type(s) == "string") then
+        error("s must be of type 'string', but was " .. type(s), 1)
+    elseif not (type(sep) == "string") then
+        error("sep must be of type 'string', but was " .. type(sep), 1)
+    end
     local a = {}
     local current_index = 1
     while true do

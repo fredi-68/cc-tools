@@ -1,3 +1,4 @@
+--#import journal.lua
 --#import "/lib/shared/cls.lua"
 
 Service = make_class()
@@ -6,7 +7,8 @@ function Service.init(self, service_file, directory, args)
 
     self.provides = nil
     self.dependencies = {}
-    self.auto_restart = true
+    self.auto_restart = true -- whether the host should automatically restart the service if crashed
+    self.ignore_terminate = true -- whether the host should suppress `terminate` events
 
     if directory == nil then
         self.directory = ""
@@ -26,7 +28,7 @@ function Service.start(self)
     end
     self._thread = coroutine.create(self.run)
     self.handle_event({"service_started"})
-    print("[ OK ] Service " .. self.service_file .. " started.")
+    ccd_log("[ OK ] Service " .. self.service_file .. " started.")
 end
 
 function Service.stop(self)
@@ -35,7 +37,7 @@ function Service.stop(self)
     if self.after ~= nil then
         self.after()
     end
-    print("[ OK ] Service " .. self.service_file .. " stopped.")
+    ccd_log("[ OK ] Service " .. self.service_file .. " stopped.")
 end
 
 function Service.handle_event(self, event)
@@ -54,4 +56,8 @@ function Service.check_running(self)
         return false
     end
     return coroutine.status(self._thread) ~= "dead"
+end
+
+function Service.log(self, message)
+    ccd_log(self.provides .. ": " .. message)
 end

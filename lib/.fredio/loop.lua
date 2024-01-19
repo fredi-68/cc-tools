@@ -100,7 +100,7 @@ end
 function EventLoop.close(self)
     self._is_running = false
     for i = 1, #self._tasks do
-        local task = self.tasks[i]
+        local task = self._tasks[i]
         -- make sure the Task exists and is not currently running
         -- (we cannot cancel a running task)
         if task ~= nil and task._coro == coroutine.running() then

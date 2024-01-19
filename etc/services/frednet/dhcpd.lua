@@ -20,7 +20,7 @@ DEFAULT_CONFIG = {
 
 function self.before()
     if not fs.exists(CONFIG_PATH) then
-        print("[dhcpd] First time setup, creating configuration for default context...")
+        self.log("[dhcpd] First time setup, creating configuration for default context...")
         local f = fs.open(CONFIG_PATH, "w")
         f.write(textutils.serialize(DEFAULT_CONFIG))
         f.close()

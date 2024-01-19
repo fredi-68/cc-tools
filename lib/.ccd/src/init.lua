@@ -1,6 +1,7 @@
 --#import service.lua
 --#import const.lua
 --#import host.lua
+--#import journal.lua
 --#import /lib/shared/logging.lua
 
 -- INIT SCRIPT FOR CCD.
@@ -13,6 +14,8 @@ function do_init()
     return
   end
   _G.ccd_init_done = true
+
+  ccd_log_init()
 
   -- monkey patch the OS shutdown to run our own shutdown sequence instead
   _G.original_shutdown = os.shutdown
