@@ -25,18 +25,18 @@ function resolve_hostname(hostname)
     transmit(address, 53, 53, p)
     local timeout = os.startTimer(5)
     while true do
-        local event, addr, src_port, dst_port, data = os.pullEvent()
+        local event, packet = os.pullEvent()
         if event == "frednet_message" then
-            if dst_port == 53 then
-                if data.record_type == RECORD_AUTHORITATIVE or data.record_type == RECORD_NON_AUTHORITATIVE then
-                    _RESOLVER_CACHE[hostname] = data.ip
-                    return data.ip
+            if packet.dst_port == 53 and packet.data.hostname == hostname then
+                if packet.data.record_type == RECORD_AUTHORITATIVE or packet.data.record_type == RECORD_NON_AUTHORITATIVE then
+                    _RESOLVER_CACHE[packet.data.hostname] = packet.data.ip
+                    return packet.data.ip
                 else 
-                    error("Cannot resolve hostname " .. hostname .. ": " .. data.record_type)
+                    error("Cannot resolve hostname " .. hostname .. ": " .. packet.data.record_type)
                 end
             end
         elseif event == "timer" then
-            if addr == timeout then
+            if packet == timeout then
                 error("Timeout while resolving hostname " .. hostname)
             end
         end

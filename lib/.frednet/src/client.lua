@@ -112,11 +112,11 @@ function transmit(dst_addr, dst_port, src_port, data, side)
     if type(dst_addr) == "string" then
         dst_addr = ip2num(resolve_hostname(dst_addr))
     end
-    return transmit_routed(dst_addr, dst_port, ip2num(src_addr), src_port, data, side)
+    return transmit_routed(dst_addr, dst_port, ip2num(src_addr), src_port, data, side, 0)
 end
 
-function transmit_routed(dst_addr, dst_port, src_addr, src_port, data, side)
+function transmit_routed(dst_addr, dst_port, src_addr, src_port, data, side, hops)
     assert(_connected, "Not connected to frednet.")
-    local p = IpPacket(src_addr, src_port, dst_addr, dst_port, data)
+    local p = IpPacket(src_addr, src_port, dst_addr, dst_port, data, hops)
     _frednet_send(CHANNEL_IP, p, side)
 end

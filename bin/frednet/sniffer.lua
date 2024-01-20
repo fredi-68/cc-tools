@@ -2,20 +2,23 @@ dofile("/lib/shared/logging.lua")
 
 set_log_level(INFO)
 
+local function log_packet (logger, packet, dest)
+    logger.info("[FROM " .. libfrednet.num2ip(packet.src_addr) .. ":" .. packet.src_port .. "][VIA " .. packet.hops .. "][TO " .. dest .. ":" .. packet.dst_port .."]: " .. tostring(packet.data))
+end
+
 local _loop = libfredio.EventLoop()
 
 local display_ip_packets = function ()
     local logger = Logger("IPMC")
     while libfrednet.is_connected() do
         local event = table.pack(os.pullEvent())
-        local src_addr, src_port, dst_addr, dst_port, msg
+        local packet = event[2]
         if event[1] == "frednet_message" then
-            _, src_addr, src_port, dst_port, msg = table.unpack(event)
-            logger.info("[FROM " .. libfrednet.num2ip(src_addr) .. ":" .. src_port .. "][TO localhost:" .. dst_port .."]: " .. tostring(msg))
+            log_packet(logger, packet, "localhost")
         elseif event[1] == "routed_ipmc_packet" then
-            _, src_addr, src_port, dst_addr, dst_port, msg = table.unpack(event)
-            logger.info("[FROM " .. libfrednet.num2ip(src_addr) .. ":" .. src_port .. "][TO " .. libfrednet.num2ip(dst_addr) .. ":" .. dst_port .."]: " .. tostring(msg))
+            log_packet(logger, packet, libfrednet.num2ip(packet.dst_addr))
         end
+        
     end
 end
 

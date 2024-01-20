@@ -15,12 +15,12 @@ end
 ]]
 function RTPClient.get_resource(self, path, data)
     transmit(self.host, self.port, 1, {path = path, data = data})
-    local event, src_addr, src_port, dst_port, p = os.pullEvent("frednet_message")
-    assert(p.error ~= nil, "Invalid response")
-    if p.error == 0 then
-        return p.data
+    local event, packet = os.pullEvent("frednet_message")
+    assert(packet.data.error ~= nil, "Invalid response")
+    if packet.data.error == 0 then
+        return packet.data.data
     else
-        assert(false, "Error: " .. p.error .. ", Reason: " .. tostring(p.data))
+        assert(false, "Error: " .. packet.data.error .. ", Reason: " .. tostring(packet.data.data))
     end
 end
 

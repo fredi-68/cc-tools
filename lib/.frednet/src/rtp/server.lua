@@ -64,33 +64,33 @@ function RTPServer._serve(self)
     return libfredio.async(function ()
         self.logger.info("Now serving RTP requests on port " .. self.port)
         while is_connected() do
-            local event, src_addr, src_port, dst_port, data = os.pullEvent("frednet_message")
-            if dst_port == self.port then
-                local src_addr_s = num2ip(src_addr)
-                self.logger.verbose("New connection from " .. src_addr_s .. ":" .. src_port)
-                if data.path ~= nil then
-                    local cb = self.routes[data.path]
+            local event, packet = os.pullEvent("frednet_message")
+            if packet.dst_port == self.port then
+                local src_addr_s = num2ip(packet.src_addr)
+                self.logger.verbose("New connection from " .. src_addr_s .. ":" .. packet.src_port)
+                if packet.data.path ~= nil then
+                    local cb = self.routes[packet.data.path]
                     if cb ~= nil then
                         local t = {
                             src_addr = src_addr_s,
-                            src_port = src_port,
-                            data = data.data,
+                            src_port = packet.src_port,
+                            data = packet.data.data,
                             respond = function (r_data)
-                                return transmit(src_addr, src_port, self.port, {error=0, data=r_data})
+                                return transmit(packet.src_addr, packet.src_port, self.port, {error=0, data=r_data})
                             end,
                             error = function (reason)
-                                self.logger.error("Error happened in '" .. data.path .. "': " .. reason)
-                                return transmit(src_addr, src_port, self.port, {error=3, data=reason})
+                                self.logger.error("Error happened in '" .. packet.data.path .. "': " .. reason)
+                                return transmit(packet.src_addr, packet.src_port, self.port, {error=3, data=reason})
                             end
                         }
                         cb(t)
                     else
-                        self.logger.error("ERROR: Path '" .. data.path .. "', resource location is not valid or does not exist.")
-                        transmit(src_addr, src_port, self.port, {error=2})
+                        self.logger.error("ERROR: Path '" .. packet.data.path .. "', resource location is not valid or does not exist.")
+                        transmit(packet.src_addr, packet.src_port, self.port, {error=2})
                     end
                 else
                     self.logger.error("ERROR: No path specified, invalid request.")
-                    transmit(src_addr, src_port, self.port, {error=1})
+                    transmit(packet.src_addr, packet.src_port, self.port, {error=1})
                 end
             end
         end

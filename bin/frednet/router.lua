@@ -40,15 +40,15 @@ local _loop = libfredio.EventLoop()
 
 local do_routing = function ()
     while libfrednet.is_connected() do
-        local event, src_addr, src_port, dst_addr, dst_port, msg = os.pullEvent("routed_ipmc_packet")
-        local i_src = get_route(src_addr)
-        local i_dst = get_route(dst_addr)
-        if i_src ~= i_dst then
+        local event, packet = os.pullEvent("routed_ipmc_packet")
+        local i_src = get_route(packet.src_addr)
+        local i_dst = get_route(packet.dst_addr)
+        if true or i_src ~= i_dst then
             if i_dst == nil then
-                logger.error("ERROR: No route to " .. libfrednet.num2ip(dst_addr))
+                logger.error("ERROR: No route to " .. libfrednet.num2ip(packet.dst_addr))
             else
                 logger.debug("Forwarded packet from " .. i_src.side .. " to " .. i_dst.side)
-                libfrednet.transmit_routed(dst_addr, dst_port, src_addr, src_port, msg, i_dst.side)
+                libfrednet.transmit_routed(packet.dst_addr, packet.dst_port, packet.src_addr, packet.src_port, packet.data, i_dst.side, packet.hops)
             end
         end
     end

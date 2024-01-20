@@ -25,25 +25,25 @@ function DNSServer._serve(self)
     return libfredio.async(function ()
         self.logger.info("Now serving DNS requests on port " .. self.port)
         while is_connected() do
-            local event, src_addr, src_port, dst_port, data = os.pullEvent("frednet_message")
-            if dst_port == self.port then
-                local src_addr_s = num2ip(src_addr)
+            local event, packet = os.pullEvent("frednet_message")
+            if packet.dst_port == self.port then
+                local src_addr_s = num2ip(packet.src_addr)
                 local p
-                if self.records[data.hostname] ~= nil then
-                    self.logger.verbose("Found record for host "..data.hostname .. " in record table.")
-                    p = DNSResponse(data.hostname, self.records[data.hostname], RECORD_AUTHORITATIVE)
+                if self.records[packet.data.hostname] ~= nil then
+                    self.logger.verbose("Found record for host "..packet.data.hostname .. " in record table.")
+                    p = DNSResponse(packet.data.hostname, self.records[packet.data.hostname], RECORD_AUTHORITATIVE)
                 else
                     -- if we have an upstream DNS server, try to resolve the address from there
-                    local ok, result = pcall(resolve_hostname, data.hostname)
+                    local ok, result = pcall(resolve_hostname, packet.data.hostname)
                     if ok then
-                        self.logger.verbose("Upstream DNS response for " .. data.hostname .. ": " .. result)
-                        p = DNSResponse(data.hostname, result, RECORD_NON_AUTHORITATIVE)
+                        self.logger.verbose("Upstream DNS response for " .. packet.data.hostname .. ": " .. result)
+                        p = DNSResponse(packet.data.hostname, result, RECORD_NON_AUTHORITATIVE)
                     else
-                        self.logger.verbose("Unable to resolve address for " .. data.hostname .. ": Upstream DNS query failed.")
-                        p = DNSResponse(data.hostname, nil, RECORD_NXDOMAIN)
+                        self.logger.verbose("Unable to resolve address for " .. packet.data.hostname .. ": Upstream DNS query failed.")
+                        p = DNSResponse(packet.data.hostname, nil, RECORD_NXDOMAIN)
                     end
                 end
-                transmit(src_addr, src_port, self.port, p)
+                transmit(packet.src_addr, packet.src_port, self.port, p)
             end
         end
         self.logger.info("exit")
