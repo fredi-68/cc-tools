@@ -17,6 +17,7 @@ function ServiceHost.resolve_service_name(self, name)
 end
 
 function ServiceHost._run(self)
+    local stop_target = _G.original_shutdown
     while true do
         local event = table.pack(os.pullEventRaw())
         if event[1] == E_SERVICE_START then
@@ -34,12 +35,15 @@ function ServiceHost._run(self)
                     break
                 end
             end
-        elseif event[1] == E_SHUTDOWN then
+        elseif event[1] == E_SHUTDOWN or event[1] == E_REBOOT then
             for i, service in ipairs(self.running_services) do
                 service.stop()
             end
             self.running_services = {}
             ccd_log("Goodbye.")
+            if event[1] == E_REBOOT then
+                stop_target = _G.original_reboot
+            end
             break
         end
 
@@ -98,9 +102,8 @@ function ServiceHost._run(self)
             end 
         end
     end
-    -- TODO: handle different targets (shutdown, reboot, root shell, etc...)
     sleep(0.5)
-    _G.original_shutdown()
+    stop_target()
 end
 
 function ServiceHost.run(self) 

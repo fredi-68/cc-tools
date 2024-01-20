@@ -19,9 +19,15 @@ function do_init()
 
   -- monkey patch the OS shutdown to run our own shutdown sequence instead
   _G.original_shutdown = os.shutdown
+  _G.original_reboot = os.reboot
   os.shutdown = function () 
     e = _ENV
     e.arg = {"start", "/etc/services/shutdown.lua", "0"}
+    loadfile("/bin/systemctl.lua", e)()
+  end
+  os.reboot = function ()
+    e = _ENV
+    e.arg = {"start", "/etc/services/reboot.lua", "0"}
     loadfile("/bin/systemctl.lua", e)()
   end
 
