@@ -19,9 +19,9 @@ function RTPClient.get_resource(self, path, data)
     local timeout = os.startTimer(5)
     while true do
         event, packet = os.pullEvent()
-        if event[1] == "timer" and packet == timeout then
+        if event == "timer" and packet == timeout then
             error("Request timed out.")
-        elseif event[1] == "frednet_message" and packet.dst_port == self.port then
+        elseif event == "frednet_message" and packet.dst_port == self.port then
             break
         end
     end
