@@ -34,7 +34,7 @@ end
     Returns the configured IP address for the local host.
 ]]
 function get_local_host_ip()
-    if _CONFIG.dhcp_lease ~= nil then
+    if _CONFIG.dhcp_lease ~= nil and _CONFIG.dhcp_lease.ip ~= nil then
         return _CONFIG.dhcp_lease.ip
     end
     return _CONFIG.ip
