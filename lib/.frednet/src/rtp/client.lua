@@ -15,7 +15,16 @@ end
 ]]
 function RTPClient.get_resource(self, path, data)
     transmit(self.host, self.port, 1, {path = path, data = data})
-    local event, packet = os.pullEvent("frednet_message")
+    local event, packet
+    local timeout = os.startTimer(5)
+    while true do
+        event, packet = os.pullEvent()
+        if event[1] == "timer" and packet == timeout then
+            error("Request timed out.")
+        elseif event[1] == "frednet_message" and packet.dst_port == self.port then
+            break
+        end
+    end
     assert(packet.data.error ~= nil, "Invalid response")
     if packet.data.error == 0 then
         return packet.data.data
