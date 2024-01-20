@@ -1,7 +1,19 @@
-CHANNEL_IP = 0x01
-CHANNEL_DHCP = 0x02
-CHANNEL_ARP = 0x04
-CHANNEL_GPS = 0x06
+--[[
+    rednet is integrated into the CC default bios and cannot be truly disabled.
+    This means that in order to avoid unnecessary overhead and invalid rednet
+    messages being dispatched, we need to avoid using modem channels also (potentially)
+    in use by rednet.
+
+    Rednet uses the following ranges: 
+    - 0 ~ 65500     Direct computer addressing
+    - 65533         Message repeating
+    - 65534         GPS
+    - 65535         Broadcast
+]]
+CHANNEL_IP = 0xffdd
+CHANNEL_DHCP = 0xffde
+CHANNEL_ARP = 0xffdf
+CHANNEL_GPS = 0xffe0
 
 ALL_CHANNELS = {
     CHANNEL_IP,
