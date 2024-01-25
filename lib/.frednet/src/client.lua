@@ -18,7 +18,8 @@ settings.load(".frednet-client")
 
 local packet_handlers = {
     [CHANNEL_IP] = ipmc_handle_packet,
-    [CHANNEL_DHCP] = dhcp_handle_packet
+    [CHANNEL_DHCP] = dhcp_handle_packet,
+    [CHANNEL_ANSIBLE] = ipmc_handle_packet
 }
 
 local function _open_modem(m)
@@ -96,6 +97,7 @@ function _frednet_send(channel, data, side)
         end
     else
         assert(modems[side] ~= nil, "Tried sending packet via interface on side " .. side .. " but no modem was found.")
+        assert(modems[side].isOpen(channel), "Tried sending packet via interface on closed channel " .. tostring(channel))
         modems[side].transmit(channel, channel, data)
     end
 end
@@ -115,8 +117,8 @@ function transmit(dst_addr, dst_port, src_port, data, side)
     return transmit_routed(dst_addr, dst_port, ip2num(src_addr), src_port, data, side, 0)
 end
 
-function transmit_routed(dst_addr, dst_port, src_addr, src_port, data, side, hops)
+function transmit_routed(dst_addr, dst_port, src_addr, src_port, data, side, hops, ch)
     assert(_connected, "Not connected to frednet.")
     local p = IpPacket(src_addr, src_port, dst_addr, dst_port, data, hops)
-    _frednet_send(CHANNEL_IP, p, side)
+    _frednet_send(ch or CHANNEL_IP, p, side)
 end

@@ -14,6 +14,7 @@ CHANNEL_IP = 0xffdd
 CHANNEL_DHCP = 0xffde
 CHANNEL_ARP = 0xffdf
 CHANNEL_GPS = 0xffe0
+CHANNEL_ANSIBLE = 0xffe1 -- special channel for ender modems, not open by default
 
 ALL_CHANNELS = {
     CHANNEL_IP,

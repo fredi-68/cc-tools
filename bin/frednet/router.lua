@@ -14,6 +14,19 @@ if router_config.routes ~= nil then
         local netmask_int = libfrednet.ip2num(config.netmask)
         config.netmask = netmask_int
         routing_table[network_int] = config
+        if config.is_ansible then
+            --[[
+                This little hack basically implements
+                https://github.com/cc-tweaked/CC-Tweaked/issues/955
+                until it gets upstreamed.
+                Basically, any modem marked as an "ansible" will stop
+                communicating on common frednet channels and instead use the
+                special CHANNEL_ANSIBLE channel for communicating with other
+                ansibles. Use this to create a mesh network of ender modems.
+            ]]
+            peripheral.call(config.side, "closeAll")
+            peripheral.call(config.side, "open", libfrednet.CHANNEL_ANSIBLE)
+        end
     end
 end
 
@@ -43,12 +56,16 @@ local do_routing = function ()
         local event, packet = os.pullEvent("routed_ipmc_packet")
         local i_src = get_route(packet.src_addr)
         local i_dst = get_route(packet.dst_addr)
-        if true or i_src ~= i_dst then
+        local ch = nil
+        if i_src ~= i_dst then
             if i_dst == nil then
                 logger.error("ERROR: No route to " .. libfrednet.num2ip(packet.dst_addr))
             else
+                if i_dst.is_ansible then
+                    ch = libfrednet.CHANNEL_ANSIBLE
+                end
                 logger.debug("Forwarded packet from " .. i_src.side .. " to " .. i_dst.side)
-                libfrednet.transmit_routed(packet.dst_addr, packet.dst_port, packet.src_addr, packet.src_port, packet.data, i_dst.side, packet.hops)
+                libfrednet.transmit_routed(packet.dst_addr, packet.dst_port, packet.src_addr, packet.src_port, packet.data, i_dst.side, packet.hops, ch)
             end
         end
     end
