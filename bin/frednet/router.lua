@@ -7,14 +7,23 @@ local routing_table = {}
 local main_gateway = nil
 if router_config.routes ~= nil then
     for network, config in pairs(router_config.routes) do
+        if config.side == nil then
+            error("Config error: Failed to specify interface for network route " .. network)
+        end
         local network_int = libfrednet.ip2num(network)
         if config.is_gateway then
+            if config.is_relay then
+                error("Config error: Interface " .. config.side .. ": gateway cannot be relay.")
+            end
             main_gateway = network_int
         end
         local netmask_int = libfrednet.ip2num(config.netmask)
         config.netmask = netmask_int
         routing_table[network_int] = config
         if config.is_ansible then
+            if config.is_relay then
+                error("Config error: Interface " .. config.side .. ": ansible cannot be relay.")
+            end
             --[[
                 This little hack basically implements
                 https://github.com/cc-tweaked/CC-Tweaked/issues/955
@@ -57,15 +66,19 @@ local do_routing = function ()
         local i_src = get_route(packet.src_addr)
         local i_dst = get_route(packet.dst_addr)
         local ch = nil
-        if i_src ~= i_dst then
-            if i_dst == nil then
-                logger.error("ERROR: No route to " .. libfrednet.num2ip(packet.dst_addr))
-            else
-                if i_dst.is_ansible then
-                    ch = libfrednet.CHANNEL_ANSIBLE
+        if i_src == nil then
+            logger.warn("Received bogus packet from unknown network: " .. libfrednet.num2ip(packet.src_addr))
+        else
+            if i_src ~= i_dst or i_src.is_relay then
+                if i_dst == nil then
+                    logger.error("ERROR: No route to " .. libfrednet.num2ip(packet.dst_addr))
+                else
+                    if i_dst.is_ansible then
+                        ch = libfrednet.CHANNEL_ANSIBLE
+                    end
+                    logger.debug("Forwarded packet from " .. i_src.side .. " to " .. i_dst.side)
+                    libfrednet.transmit_routed(packet.dst_addr, packet.dst_port, packet.src_addr, packet.src_port, packet.data, i_dst.side, packet.hops, ch)
                 end
-                logger.debug("Forwarded packet from " .. i_src.side .. " to " .. i_dst.side)
-                libfrednet.transmit_routed(packet.dst_addr, packet.dst_port, packet.src_addr, packet.src_port, packet.data, i_dst.side, packet.hops, ch)
             end
         end
     end
