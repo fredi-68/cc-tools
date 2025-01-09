@@ -5,4 +5,7 @@ if src == nil or dst == nil then
 end
 src = shell.resolve(src)
 dst = shell.resolve(dst)
+if fs.isDir(dst) and not fs.isDir(src) then
+    dst = dst .. "/" .. fs.getName(src)
+end
 fs.move(src, dst)
