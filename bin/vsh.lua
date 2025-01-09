@@ -256,11 +256,11 @@ function execute_command(tokens)
     while i <= #tokens do
         local ct = tokens[i]
         if ct == ">" then
-            rd_out = tokens[i+1]
+            rd_out = resolve(tokens[i+1])
             stop = math.min(i - 1, stop) -- stop parsing arguments here
             i = i + 1 -- skip over argument
         elseif ct == "<" then
-            rd_in = tokens[i+1]
+            rd_in = resolve(tokens[i+1])
             stop = math.min(i - 1, stop)
             i = i + 1
         end
