@@ -167,6 +167,10 @@ local function _execute(pipe, rd, name, ...)
     end
 
     if name == "cd" then
+        if args[1] == nil then
+            CWD = "/"
+            return true
+        end
         path = resolve(args[1])
         if not fs.exists(path) then
             _error("cd: no such file or directory: " .. args[1])
