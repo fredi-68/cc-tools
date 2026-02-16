@@ -182,6 +182,7 @@ server.route("/get_status", function(request)
         efficiency = reactor.getFuelReactivity()/100,
         core_temperature = reactor.getFuelTemperature(),
         fuel_level = reactor.getFuelAmount(),
+        fuel_max = reactor.getFuelAmountMax(),
         waste_level = reactor.getWasteAmount(),
     })
 end)
