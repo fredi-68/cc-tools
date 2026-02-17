@@ -120,5 +120,8 @@ end
 function transmit_routed(dst_addr, dst_port, src_addr, src_port, data, side, hops, ch)
     assert(_connected, "Not connected to frednet.")
     local p = IpPacket(src_addr, src_port, dst_addr, dst_port, data, hops)
+    if src_addr == dst_addr then -- addressed to us, invoke handler directly
+        return ipmc_handle_packet(p, nil, 0)
+    end
     _frednet_send(ch or CHANNEL_IP, p, side)
 end
