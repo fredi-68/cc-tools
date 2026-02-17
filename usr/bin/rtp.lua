@@ -4,13 +4,25 @@
     Useful for API exploration during development.
 ]]
 
+dofile("/lib/shared/cli_tools.lua")
+
+parser = ArgumentParser("rtp", "simple RTP client")
+parser.add_flag("port", "p", STORE)
+parser.parse()
+
+if parser.args.port == nil then
+    parser.args.port = 80
+else
+    parser.args.port = tonumber(parser.args.port)
+end
+
 loop = libfredio.EventLoop()
 
 function application()
     print("Please enter the address of the RTP server: ")
     local addr = read()
-    print("Connecting...")
-    local client = libfrednet.RTPClient(addr, 80)
+    print("Connecting to " .. addr .. ":" .. parser.args.port .. "...")
+    local client = libfrednet.RTPClient(addr, parser.args.port)
     print("Connected to RTP server at " .. addr .. " . Type resource names to query them from the server or type 'exit' to quit. HINT: Use '/index' to generate a list of available routes on supporting servers.")
     while true do
         io.write(">>> ")
